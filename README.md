@@ -50,7 +50,7 @@ postgres: Motor de base de datos relacional para el almacenamiento local de fich
 
 api-soc: Microservicio backend construido en FastAPI expuesto en el puerto 8000.
 
- 📂 Estructura del Repositorio
+## 📂 Estructura del Repositorio
 
 SEMANA_3/
   ├── README.md
@@ -110,90 +110,147 @@ POSTGRES_DB=soc_incidentes_db
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin123
 
-🧑‍💻 Guía de Despliegue por Pasos
+# 🛡️ Sistema de Registro de Incidentes SOC en Blockchain
 
-Paso 1: Compilación del Smart Contract del SOC
-Accede al directorio del componente blockchain, instala los módulos necesarios y compila el archivo .sol para generar los artefactos (ABIs):
+Plataforma de auditoría inmutable para la gestión de incidentes de ciberseguridad, construida sobre un Smart Contract de Ethereum, una API en FastAPI y persistencia en PostgreSQL.
 
+> 💻 Proyecto Académico Final desarrollado en el marco de la **Especialidad en Sistemas de Información con mención en Blockchain y Arquitectura en la Nube** — UTPL 2026.
+
+---
+
+## 📑 Tabla de Contenidos
+
+- [🚀 Guía de Despliegue por Pasos](#-guía-de-despliegue-por-pasos)
+- [📊 Matriz de Control de Datos y SLAs](#-matriz-de-control-de-datos-y-slas)
+- [🧪 Pruebas e Interacción con la API](#-pruebas-e-interacción-con-la-api)
+- [🐳 Distribución e Integración Continua](#-distribución-e-integración-continua-docker-hub)
+- [🛠️ Comandos Útiles de Administración](#️-comandos-útiles-de-administración)
+
+---
+
+## 🚀 Guía de Despliegue por Pasos
+
+### Paso 1: Compilación del Smart Contract del SOC
+
+Accede al directorio del componente blockchain, instala los módulos necesarios y compila el archivo `.sol` para generar los artefactos (ABIs):
+
+```bash
 cd blockchain
 npm install
 npx hardhat compile
+```
 
 Si deseas probar el flujo de despliegue completo en la red de pruebas de memoria efímera de Hardhat, ejecuta:
 
+```bash
 npx hardhat run scripts/deploy-soc.ts
+```
 
-Paso 2: Construcción de la Imagen Docker del Contrato
+### Paso 2: Construcción de la Imagen Docker del Contrato
+
 Para empaquetar la capa blockchain y compilar de manera automatizada el código dentro de un entorno aislado de Docker:
 
+```bash
 docker build -t registro-incidentes-soc-image ./blockchain
+```
 
 Puedes validar la imagen levantando el contenedor con el script de despliegue automatizado:
 
+```bash
 docker run --rm registro-incidentes-soc-image npx hardhat run scripts/deploy-soc.ts
+```
 
-Paso 3: Levantar el Nodo Ledger Local
+### Paso 3: Levantar el Nodo Ledger Local
+
 Regresa a la raíz de la práctica e inicia el contenedor encargado de simular el entorno de la red blockchain:
 
+```bash
 docker compose up -d blockchain-node
+```
 
 Inspecciona que el nodo de infraestructura se encuentre corriendo correctamente:
 
+```bash
 docker compose ps
 docker compose logs blockchain-node
+```
 
-Paso 4: Despliegue del Contrato en el Nodo Blockchain
-Utiliza el contenedor de utilidades (contract-tools) para desplegar de forma persistente tu contrato inteligente de ciberseguridad sobre la red en ejecución:
+### Paso 4: Despliegue del Contrato en el Nodo Blockchain
 
+Utiliza el contenedor de utilidades (`contract-tools`) para desplegar de forma persistente tu contrato inteligente de ciberseguridad sobre la red en ejecución:
+
+```bash
 docker compose run --rm contract-tools npx hardhat run scripts/deploy-soc.ts --network ganache
+```
 
-Resultado esperado en terminal:
+**Resultado esperado en terminal:**
 
+```text
 Desplegando contrato de infraestructura SOC (RegistroIncidentesSOC)...
 Contrato de auditoría inmutable desplegado correctamente.
 Dirección del contrato SOC: 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+```
 
-[!IMPORTANT]
-Copia la dirección hexadecimal obtenida (0x...) y actualiza la variable CONTRACT_ADDRESS dentro de tu archivo .env global antes de proceder con el siguiente paso.
+> [!IMPORTANT]
+> Copia la dirección hexadecimal obtenida (`0x...`) y actualiza la variable `CONTRACT_ADDRESS` dentro de tu archivo `.env` global antes de proceder con el siguiente paso.
 
-Paso 5: Despliegue Completo de los Servicios
-Una vez configurado el archivo .env con la dirección real del contrato, levanta toda la arquitectura (PostgreSQL y la API de FastAPI):
+### Paso 5: Despliegue Completo de los Servicios
 
+Una vez configurado el archivo `.env` con la dirección real del contrato, levanta toda la arquitectura (PostgreSQL y la API de FastAPI):
+
+```bash
 docker compose up -d --build
+```
 
 Comprueba que todos los microservicios se encuentren en estado de ejecución estable:
 
+```bash
 docker compose ps
+```
 
-📊 Matriz de Control de Datos y SLAs
+---
 
-Ciclo de Vida del Incidente
+## 📊 Matriz de Control de Datos y SLAs
+
+### Ciclo de Vida del Incidente
+
 El Smart Contract restringe las transacciones para que sigan secuencialmente el flujo operativo detallado en la investigación académica:
-Reportado ➡️ Triageado ➡️ EnProgreso ➡️ Escalado ➡️ Resuelto ➡️ Cerrado.
 
-Control de Tiempos Límites (SLA) por Gravedad
+```text
+Reportado ➡️ Triageado ➡️ EnProgreso ➡️ Escalado ➡️ Resuelto ➡️ Cerrado
+```
 
-Gravedad (Enum ID)Nivel de SeveridadTiempo Máximo de Respuesta (SLA)0BAJO24 Horas1MEDIO4 Horas2ALTO1 Hora3CRITICO15 Minutos
+### Control de Tiempos Límite (SLA) por Gravedad
 
-🧪 Pruebas e Interacción con la API
+| Gravedad (Enum ID) | Nivel de Severidad | Tiempo Máximo de Respuesta (SLA) |
+|:---:|:---|:---:|
+| `0` | 🟢 BAJO | 24 Horas |
+| `1` | 🟡 MEDIO | 4 Horas |
+| `2` | 🟠 ALTO | 1 Hora |
+| `3` | 🔴 CRÍTICO | 15 Minutos |
 
-1. Interfaz Interactiva de Swagger
+---
+
+## 🧪 Pruebas e Interacción con la API
+
+### 1. Interfaz Interactiva de Swagger
+
 Una vez que todos los contenedores estén activos, accede a la documentación interactiva provista de forma automática por FastAPI ingresando a:
-🔗 http://localhost:8000/docs
+
+🔗 **http://localhost:8000/docs**
 
 Puedes ejecutar las pruebas funcionales directamente en el navegador siguiendo este orden lógico:
 
-GET /health (Estado general del backend).
+1. `GET /health` — Estado general del backend.
+2. `GET /blockchain/contract` — Validación de dirección y ABIs expuestas.
+3. `POST /incidentes` — Creación de un registro cruzado.
+4. `GET /incidentes/{id_ticket}/verificar` — Auditoría criptográfica en tiempo real.
 
-GET /blockchain/contract (Validación de dirección y ABIs expuestas).
+### 2. Automatización desde Consola (PowerShell)
 
-POST /incidentes (Creación de un registro cruzado).
-
-GET /incidentes/{id_ticket}/verificar (Auditoría criptográfica en tiempo real).
-
-2. Automatización desde Consola (PowerShell)
 Para registrar un incidente crítico de ciberseguridad (ej. ataque de Ransomware en servidores AD) mediante comandos de terminal:
 
+```powershell
 $body = @{
   codigo_titulo = "INC-SOC-2026-8942"
   nombre_estudiante = "Servidor Active Directory"
@@ -206,28 +263,38 @@ $body = @{
 } | ConvertTo-Json
 
 Invoke-RestMethod -Uri "http://localhost:8000/incidentes" -Method Post -ContentType "application/json" -Body $body
+```
 
 Para validar de forma cruzada la inmutabilidad y la cadena de custodia del artefacto forense frente al ledger:
 
+```powershell
 Invoke-RestMethod -Uri "http://localhost:8000/incidentes/INC-SOC-2026-8942/verificar"
+```
 
-Respuesta Exitosa de Auditoría:
+**Respuesta Exitosa de Auditoría:**
 
+```json
 {
   "existe_en_blockchain": true,
   "evidencia_mantiene_integridad": true
 }
+```
 
-🐳 Distribución e Integración Continua (Docker Hub)
+---
+
+## 🐳 Distribución e Integración Continua (Docker Hub)
 
 Para empaquetar de forma estable tus imágenes corporativas del SOC y distribuirlas a entornos de orquestación avanzados (Staging, Producción o clústeres de Kubernetes):
 
-1. Autentícate desde la línea de comandos:
+**1. Autentícate desde la línea de comandos:**
 
+```bash
 docker login
+```
 
-2. Construye y etiqueta tus imágenes (Reemplaza TU_USUARIO_DOCKERHUB por tu identificador real de la plataforma):
+**2. Construye y etiqueta tus imágenes** (reemplaza `TU_USUARIO_DOCKERHUB` por tu identificador real de la plataforma):
 
+```bash
 # Capa de automatización de Smart Contracts
 docker build -t TU_USUARIO_DOCKERHUB/soc-blockchain-contract:1.0 ./blockchain
 docker tag TU_USUARIO_DOCKERHUB/soc-blockchain-contract:1.0 TU_USUARIO_DOCKERHUB/soc-blockchain-contract:latest
@@ -235,34 +302,41 @@ docker tag TU_USUARIO_DOCKERHUB/soc-blockchain-contract:1.0 TU_USUARIO_DOCKERHUB
 # Backend API de Gestión Operativa
 docker build -t TU_USUARIO_DOCKERHUB/soc-control-api:1.0 ./api-soc
 docker tag TU_USUARIO_DOCKERHUB/soc-control-api:1.0 TU_USUARIO_DOCKERHUB/soc-control-api:latest
+```
 
-3. Publica las imágenes en los repositorios de Docker Hub:
+**3. Publica las imágenes en los repositorios de Docker Hub:**
 
+```bash
 docker push TU_USUARIO_DOCKERHUB/soc-blockchain-contract:latest
 docker push TU_USUARIO_DOCKERHUB/soc-control-api:latest
+```
 
-🛠️ Comandos Útiles de Administración
-Apagar la infraestructura manteniendo persistencia de datos:
+---
 
+## 🛠️ Comandos Útiles de Administración
+
+**Apagar la infraestructura manteniendo persistencia de datos:**
+
+```bash
 docker compose down
+```
 
-Destruir los contenedores borrando todos los datos (Volúmenes limpios):
+**Destruir los contenedores borrando todos los datos (volúmenes limpios):**
 
+```bash
 docker compose down -v
+```
 
-Monitorear logs específicos de la API del SOC:
+**Monitorear logs específicos de la API del SOC:**
 
+```bash
 docker compose logs api-soc
+```
 
-💻 Proyecto Académico Final desarrollado en el marco de la Especialidad en Sistemas de Información con mención en Blockchain y Arquitectura en la Nube - UTPL 2026.
+---
 
-### Características clave del formato para GitHub:
-1. **Badges/Emojis:** Se agregaron iconos estratégicos (`🛡️`, `🚀`, `🔍`, etc.) para dar una apariencia profesional.
-2. **Estructura de Directorios Limpia:** El bloque de código de la estructura usa caracteres de caja (`├──`, `│`) que GitHub renderiza de forma óptima.
-3. **Alertas de GitHub:** Se utilizó el componente nativo de alertas de GitHub `> [!IMPORTANT]` para destacar el paso crítico de la dirección del contrato inteligente.
-4. **Tablas Markdown:** La sección de SLAs se formateó como una tabla Markdown nativa para facilitar su lectura en la pestaña principal del repositorio.
-
-
-
+<p align="center">
+💻 Proyecto Académico Final — Especialidad en Sistemas de Información con mención en Blockchain y Arquitectura en la Nube · UTPL 2026
+</p>
 
 
