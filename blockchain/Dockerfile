@@ -20,3 +20,28 @@ RUN npx hardhat compile
 # Reemplazamos "crear-titulo.ts" por el nombre de tu nuevo script (ej. deploy-soc.ts)
 CMD ["npx", "hardhat", "run", "scripts/crear-incidente.ts"]
 CMD [ "npx", "hardhat", "compile"]
+
+DOCKER FILE OPTIMIZADO
+
+
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Instalar dependencias de Node.js
+COPY package*.json ./
+RUN npm install
+
+# Copiar configuración y dependencias del entorno de desarrollo
+COPY hardhat.config.ts tsconfig.json ./
+COPY contracts/ contracts
+COPY scripts/ scripts
+COPY test/ test
+
+# COMPILACIÓN: Compila los contratos inteligentes (RegistroIncidentesSOC.sol) 
+# durante la fase de construcción de la imagen (capa estática).
+RUN npx hardhat compile
+
+# EJECUCIÓN: Comando por defecto que se ejecuta únicamente al levantar el contenedor.
+# Corre el script de TypeScript que interactúa con el Smart Contract del SOC.
+CMD ["npx", "hardhat", "run", "scripts/crear-incidente.ts"]
