@@ -50,7 +50,7 @@ postgres: Motor de base de datos relacional para el almacenamiento local de fich
 
 api-soc: Microservicio backend construido en FastAPI expuesto en el puerto 8000.
 
-# 📂 Estructura del Repositorio
+ 📂 Estructura del Repositorio
 
 SEMANA_3/
   ├── README.md
@@ -78,7 +78,8 @@ SEMANA_3/
           └── RegistroIncidentesSOC.json
 
 
-#🛠️ Requisitos Previos
+## 🛠️ Requisitos Previos
+
 Asegúrate de contar con las siguientes herramientas instaladas en tu estación de trabajo local:
 
 Docker Desktop activo.
@@ -95,6 +96,7 @@ node --version
 npm --version
 
 🔑 Variables de Entorno
+
 Configura las credenciales locales copiando la plantilla base de entorno en la raíz del proyecto SEMANA_3:
 
 cp .env.example .env
@@ -108,22 +110,91 @@ POSTGRES_DB=soc_incidentes_db
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin123
 
-🧑‍💻 Guía de Despliegue por PasosPaso 1: Compilación del Smart Contract del SOCAccede al directorio del componente blockchain, instala los módulos necesarios y compila el archivo .sol para generar los artefactos (ABIs):Bashcd blockchain
+🧑‍💻 Guía de Despliegue por Pasos
+
+Paso 1: Compilación del Smart Contract del SOC
+Accede al directorio del componente blockchain, instala los módulos necesarios y compila el archivo .sol para generar los artefactos (ABIs):
+
+cd blockchain
 npm install
 npx hardhat compile
-Si deseas probar el flujo de despliegue completo en la red de pruebas de memoria efímera de Hardhat, ejecuta:Bashnpx hardhat run scripts/deploy-soc.ts
-Paso 2: Construcción de la Imagen Docker del ContratoPara empaquetar la capa blockchain y compilar de manera automatizada el código dentro de un entorno aislado de Docker:Bashdocker build -t registro-incidentes-soc-image ./blockchain
-Puedes validar la imagen levantando el contenedor con el script de despliegue automatizado:Bashdocker run --rm registro-incidentes-soc-image npx hardhat run scripts/deploy-soc.ts
-Paso 3: Levantar el Nodo Ledger LocalRegresa a la raíz de la práctica e inicia el contenedor encargado de simular el entorno de la red blockchain:Bashdocker compose up -d blockchain-node
-Inspecciona que el nodo de infraestructura se encuentre corriendo correctamente:Bashdocker compose ps
+
+Si deseas probar el flujo de despliegue completo en la red de pruebas de memoria efímera de Hardhat, ejecuta:
+
+npx hardhat run scripts/deploy-soc.ts
+
+Paso 2: Construcción de la Imagen Docker del Contrato
+Para empaquetar la capa blockchain y compilar de manera automatizada el código dentro de un entorno aislado de Docker:
+
+docker build -t registro-incidentes-soc-image ./blockchain
+
+Puedes validar la imagen levantando el contenedor con el script de despliegue automatizado:
+
+docker run --rm registro-incidentes-soc-image npx hardhat run scripts/deploy-soc.ts
+
+Paso 3: Levantar el Nodo Ledger Local
+Regresa a la raíz de la práctica e inicia el contenedor encargado de simular el entorno de la red blockchain:
+
+docker compose up -d blockchain-node
+
+Inspecciona que el nodo de infraestructura se encuentre corriendo correctamente:
+
+docker compose ps
 docker compose logs blockchain-node
-Paso 4: Despliegue del Contrato en el Nodo BlockchainUtiliza el contenedor de utilidades (contract-tools) para desplegar de forma persistente tu contrato inteligente de ciberseguridad sobre la red en ejecución:Bashdocker compose run --rm contract-tools npx hardhat run scripts/deploy-soc.ts --network ganache
-Resultado esperado en terminal:PlaintextDesplegando contrato de infraestructura SOC (RegistroIncidentesSOC)...
+
+Paso 4: Despliegue del Contrato en el Nodo Blockchain
+Utiliza el contenedor de utilidades (contract-tools) para desplegar de forma persistente tu contrato inteligente de ciberseguridad sobre la red en ejecución:
+
+docker compose run --rm contract-tools npx hardhat run scripts/deploy-soc.ts --network ganache
+
+Resultado esperado en terminal:
+
+Desplegando contrato de infraestructura SOC (RegistroIncidentesSOC)...
 Contrato de auditoría inmutable desplegado correctamente.
 Dirección del contrato SOC: 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
-[!IMPORTANT]Copia la dirección hexadecimal obtenida (0x...) y actualiza la variable CONTRACT_ADDRESS dentro de tu archivo .env global antes de proceder con el siguiente paso.Paso 5: Despliegue Completo de los ServiciosUna vez configurado el archivo .env con la dirección real del contrato, levanta toda la arquitectura (PostgreSQL y la API de FastAPI):Bashdocker compose up -d --build
-Comprueba que todos los microservicios se encuentren en estado de ejecución estable:Bashdocker compose ps
-📊 Matriz de Control de Datos y SLAsCiclo de Vida del IncidenteEl Smart Contract restringe las transacciones para que sigan secuencialmente el flujo operativo detallado en la investigación académica:Reportado ➡️ Triageado ➡️ EnProgreso ➡️ Escalado ➡️ Resuelto ➡️ Cerrado.Control de Tiempos Límites (SLA) por GravedadGravedad (Enum ID)Nivel de SeveridadTiempo Máximo de Respuesta (SLA)0BAJO24 Horas1MEDIO4 Horas2ALTO1 Hora3CRITICO15 Minutos🧪 Pruebas e Interacción con la API1. Interfaz Interactiva de SwaggerUna vez que todos los contenedores estén activos, accede a la documentación interactiva provista de forma automática por FastAPI ingresando a:🔗 http://localhost:8000/docsPuedes ejecutar las pruebas funcionales directamente en el navegador siguiendo este orden lógico:GET /health (Estado general del backend).GET /blockchain/contract (Validación de dirección y ABIs expuestas).POST /incidentes (Creación de un registro cruzado).GET /incidentes/{id_ticket}/verificar (Auditoría criptográfica en tiempo real).2. Automatización desde Consola (PowerShell)Para registrar un incidente crítico de ciberseguridad (ej. ataque de Ransomware en servidores AD) mediante comandos de terminal:PowerShell$body = @{
+
+[!IMPORTANT]
+Copia la dirección hexadecimal obtenida (0x...) y actualiza la variable CONTRACT_ADDRESS dentro de tu archivo .env global antes de proceder con el siguiente paso.
+
+Paso 5: Despliegue Completo de los Servicios
+Una vez configurado el archivo .env con la dirección real del contrato, levanta toda la arquitectura (PostgreSQL y la API de FastAPI):
+
+docker compose up -d --build
+
+Comprueba que todos los microservicios se encuentren en estado de ejecución estable:
+
+docker compose ps
+
+📊 Matriz de Control de Datos y SLAs
+
+Ciclo de Vida del Incidente
+El Smart Contract restringe las transacciones para que sigan secuencialmente el flujo operativo detallado en la investigación académica:
+Reportado ➡️ Triageado ➡️ EnProgreso ➡️ Escalado ➡️ Resuelto ➡️ Cerrado.
+
+Control de Tiempos Límites (SLA) por Gravedad
+
+Gravedad (Enum ID)Nivel de SeveridadTiempo Máximo de Respuesta (SLA)0BAJO24 Horas1MEDIO4 Horas2ALTO1 Hora3CRITICO15 Minutos
+
+🧪 Pruebas e Interacción con la API
+
+1. Interfaz Interactiva de Swagger
+Una vez que todos los contenedores estén activos, accede a la documentación interactiva provista de forma automática por FastAPI ingresando a:
+🔗 http://localhost:8000/docs
+
+Puedes ejecutar las pruebas funcionales directamente en el navegador siguiendo este orden lógico:
+
+GET /health (Estado general del backend).
+
+GET /blockchain/contract (Validación de dirección y ABIs expuestas).
+
+POST /incidentes (Creación de un registro cruzado).
+
+GET /incidentes/{id_ticket}/verificar (Auditoría criptográfica en tiempo real).
+
+2. Automatización desde Consola (PowerShell)
+Para registrar un incidente crítico de ciberseguridad (ej. ataque de Ransomware en servidores AD) mediante comandos de terminal:
+
+$body = @{
   codigo_titulo = "INC-SOC-2026-8942"
   nombre_estudiante = "Servidor Active Directory"
   identificacion_estudiante = "10.0.4.15"
@@ -135,28 +206,63 @@ Comprueba que todos los microservicios se encuentren en estado de ejecución est
 } | ConvertTo-Json
 
 Invoke-RestMethod -Uri "http://localhost:8000/incidentes" -Method Post -ContentType "application/json" -Body $body
-Para validar de forma cruzada la inmutabilidad y la cadena de custodia del artefacto forense frente al ledger:PowerShellInvoke-RestMethod -Uri "http://localhost:8000/incidentes/INC-SOC-2026-8942/verificar"
-Respuesta Exitosa de Auditoría:JSON{
+
+Para validar de forma cruzada la inmutabilidad y la cadena de custodia del artefacto forense frente al ledger:
+
+Invoke-RestMethod -Uri "http://localhost:8000/incidentes/INC-SOC-2026-8942/verificar"
+
+Respuesta Exitosa de Auditoría:
+
+{
   "existe_en_blockchain": true,
   "evidencia_mantiene_integridad": true
 }
-🐳 Distribución e Integración Continua (Docker Hub)Para empaquetar de forma estable tus imágenes corporativas del SOC y distribuirlas a entornos de orquestación avanzados (Staging, Producción o clústeres de Kubernetes):Autentícate desde la línea de comandos:Bashdocker login
-Construye y etiqueta tus imágenes (Reemplaza TU_USUARIO_DOCKERHUB por tu identificador real de la plataforma):Bash# Capa de automatización de Smart Contracts
+
+🐳 Distribución e Integración Continua (Docker Hub)
+
+Para empaquetar de forma estable tus imágenes corporativas del SOC y distribuirlas a entornos de orquestación avanzados (Staging, Producción o clústeres de Kubernetes):
+
+1. Autentícate desde la línea de comandos:
+
+docker login
+
+2. Construye y etiqueta tus imágenes (Reemplaza TU_USUARIO_DOCKERHUB por tu identificador real de la plataforma):
+
+# Capa de automatización de Smart Contracts
 docker build -t TU_USUARIO_DOCKERHUB/soc-blockchain-contract:1.0 ./blockchain
 docker tag TU_USUARIO_DOCKERHUB/soc-blockchain-contract:1.0 TU_USUARIO_DOCKERHUB/soc-blockchain-contract:latest
 
 # Backend API de Gestión Operativa
 docker build -t TU_USUARIO_DOCKERHUB/soc-control-api:1.0 ./api-soc
 docker tag TU_USUARIO_DOCKERHUB/soc-control-api:1.0 TU_USUARIO_DOCKERHUB/soc-control-api:latest
-Publica las imágenes en los repositorios de Docker Hub:Bashdocker push TU_USUARIO_DOCKERHUB/soc-blockchain-contract:latest
+
+3. Publica las imágenes en los repositorios de Docker Hub:
+
+docker push TU_USUARIO_DOCKERHUB/soc-blockchain-contract:latest
 docker push TU_USUARIO_DOCKERHUB/soc-control-api:latest
-🛠️ Comandos Útiles de AdministraciónApagar la infraestructura manteniendo persistencia de datos:Bashdocker compose down
-Destruir los contenedores borrando todos los datos (Volúmenes limpios):Bashdocker compose down -v
-Monitorear logs específicos de la API del SOC:Bashdocker compose logs api-soc
+
+🛠️ Comandos Útiles de Administración
+Apagar la infraestructura manteniendo persistencia de datos:
+
+docker compose down
+
+Destruir los contenedores borrando todos los datos (Volúmenes limpios):
+
+docker compose down -v
+
+Monitorear logs específicos de la API del SOC:
+
+docker compose logs api-soc
+
 💻 Proyecto Académico Final desarrollado en el marco de la Especialidad en Sistemas de Información con mención en Blockchain y Arquitectura en la Nube - UTPL 2026.
 
 ### Características clave del formato para GitHub:
 1. **Badges/Emojis:** Se agregaron iconos estratégicos (`🛡️`, `🚀`, `🔍`, etc.) para dar una apariencia profesional.
 2. **Estructura de Directorios Limpia:** El bloque de código de la estructura usa caracteres de caja (`├──`, `│`) que GitHub renderiza de forma óptima.
 3. **Alertas de GitHub:** Se utilizó el componente nativo de alertas de GitHub `> [!IMPORTANT]` para destacar el paso crítico de la dirección del contrato inteligente.
-4. **Tablas Markdown:** La sección de SLAs se formateó como una tabla Markdown nativa para facilit
+4. **Tablas Markdown:** La sección de SLAs se formateó como una tabla Markdown nativa para facilitar su lectura en la pestaña principal del repositorio.
+
+
+
+
+
