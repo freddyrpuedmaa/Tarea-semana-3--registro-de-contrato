@@ -78,7 +78,7 @@ SEMANA_3/
           └── RegistroIncidentesSOC.json
 
 
-🛠️ Requisitos Previos
+#🛠️ Requisitos Previos
 Asegúrate de contar con las siguientes herramientas instaladas en tu estación de trabajo local:
 
 Docker Desktop activo.
