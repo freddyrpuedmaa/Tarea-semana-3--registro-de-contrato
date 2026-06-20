@@ -110,24 +110,6 @@ POSTGRES_DB=soc_incidentes_db
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin123
 
-# 🛡️ Sistema de Registro de Incidentes SOC en Blockchain
-
-Plataforma de auditoría inmutable para la gestión de incidentes de ciberseguridad, construida sobre un Smart Contract de Ethereum, una API en FastAPI y persistencia en PostgreSQL.
-
-> 💻 Proyecto Académico Final desarrollado en el marco de la **Especialidad en Sistemas de Información con mención en Blockchain y Arquitectura en la Nube** — UTPL 2026.
-
----
-
-## 📑 Tabla de Contenidos
-
-- [🚀 Guía de Despliegue por Pasos](#-guía-de-despliegue-por-pasos)
-- [📊 Matriz de Control de Datos y SLAs](#-matriz-de-control-de-datos-y-slas)
-- [🧪 Pruebas e Interacción con la API](#-pruebas-e-interacción-con-la-api)
-- [🐳 Distribución e Integración Continua](#-distribución-e-integración-continua-docker-hub)
-- [🛠️ Comandos Útiles de Administración](#️-comandos-útiles-de-administración)
-
----
-
 ## 🚀 Guía de Despliegue por Pasos
 
 ### Paso 1: Compilación del Smart Contract del SOC
@@ -338,5 +320,4 @@ docker compose logs api-soc
 <p align="center">
 💻 Proyecto Académico Final — Especialidad en Sistemas de Información con mención en Blockchain y Arquitectura en la Nube · UTPL 2026
 </p>
-
 
