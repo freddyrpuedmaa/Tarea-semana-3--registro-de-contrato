@@ -50,7 +50,7 @@ postgres: Motor de base de datos relacional para el almacenamiento local de fich
 
 api-soc: Microservicio backend construido en FastAPI expuesto en el puerto 8000.
 
-#📂 Estructura del Repositorio
+# 📂 Estructura del Repositorio
 
 SEMANA_3/
   ├── README.md
